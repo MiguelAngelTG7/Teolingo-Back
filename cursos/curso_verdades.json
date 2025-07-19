@@ -1,0 +1,28 @@
+{
+  "curso": {
+    "titulo": "Verdades Fundamentales",
+    "descripcion": "Curso introductorio cristocéntrico y bíblico con base apologética.",
+    "nivel": "básico",
+    "lecciones": [
+      {
+        "orden": 1,
+        "titulo": "¿Quién es Dios?",
+        "introduccion": "Conozcamos al Dios único, verdadero, eterno y creador.",
+        "ejercicios": [
+          {
+            "tipo": "opcion_multiple",
+            "pregunta": "¿Qué significa que Dios es omnisciente?",
+            "opciones": ["Lo sabe todo", "Está en todos lados", "Es todopoderoso"],
+            "respuesta_correcta": "Lo sabe todo"
+          },
+          {
+            "tipo": "completar_versiculo",
+            "versiculo": "En el principio creó Dios los ___ y la ___.",
+            "respuesta_correcta": ["cielos", "tierra"]
+          }
+        ],
+        "resumen": "Dios es eterno, sabio y digno de adoración."
+      }
+    ]
+  }
+}
