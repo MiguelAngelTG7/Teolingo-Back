@@ -9,7 +9,7 @@ class CursoSerializer(serializers.ModelSerializer):
 class EjercicioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ejercicio
-        fields = ['id', 'pregunta', 'opciones']
+        fields = ['id', 'pregunta', 'opciones', 'respuesta_correcta']
 
 class LeccionDetailSerializer(serializers.ModelSerializer):
     ejercicios = EjercicioSerializer(many=True, read_only=True)
