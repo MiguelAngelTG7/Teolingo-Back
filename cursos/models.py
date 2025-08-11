@@ -2,9 +2,17 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 
+class Categoria(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
 class Curso(models.Model):
     titulo = models.CharField(max_length=255)
     descripcion = models.TextField()
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='cursos', null=True, blank=True)
+    imagen_url = models.URLField("URL de la imagen", blank=True, null=True)
 
     def __str__(self):
         return self.titulo

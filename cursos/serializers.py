@@ -1,10 +1,19 @@
+
 from rest_framework import serializers
-from .models import Curso, Leccion, Ejercicio, Progreso
+from .models import Curso, Leccion, Ejercicio, Progreso, Categoria
+
+class CategoriaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Categoria
+        fields = ['id', 'nombre']
 
 class CursoSerializer(serializers.ModelSerializer):
+    lecciones_count = serializers.IntegerField(source='lecciones.count', read_only=True)
+    categoria = CategoriaSerializer(read_only=True)
+    imagen_url = serializers.URLField(allow_blank=True, allow_null=True, required=False)
     class Meta:
         model = Curso
-        fields = ['id', 'titulo', 'descripcion']
+        fields = ['id', 'titulo', 'descripcion', 'lecciones_count', 'categoria', 'imagen_url']
 
 class EjercicioSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,10 +43,12 @@ class LeccionDetailSerializer(serializers.ModelSerializer):
 
 class CursoDetailSerializer(serializers.ModelSerializer):
     lecciones = LeccionSerializer(many=True, read_only=True)
+    categoria = CategoriaSerializer(read_only=True)
+    imagen_url = serializers.URLField(read_only=True)
 
     class Meta:
         model = Curso
-        fields = ['id', 'titulo', 'descripcion', 'lecciones']
+        fields = ['id', 'titulo', 'descripcion', 'lecciones', 'categoria', 'imagen_url']
 
 class ProgresoLeccionSerializer(serializers.ModelSerializer):
     leccion_titulo = serializers.CharField(source='leccion.titulo', read_only=True)

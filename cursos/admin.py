@@ -1,6 +1,12 @@
 from django.contrib import admin
 from django import forms
-from .models import Curso, Leccion, Ejercicio, Progreso, Inscripcion
+from .models import Curso, Leccion, Ejercicio, Progreso, Inscripcion, Categoria
+
+@admin.register(Categoria)
+class CategoriaAdmin(admin.ModelAdmin):
+    list_display = ('id', 'nombre')
+
+
 
 # Formulario personalizado para Ejercicio
 class EjercicioAdminForm(forms.ModelForm):
@@ -54,9 +60,17 @@ class EjercicioAdminForm(forms.ModelForm):
             cleaned_data['respuesta_correcta'] = ''
         return cleaned_data
 
+from django.utils.html import format_html
+
 @admin.register(Curso)
 class CursoAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('id', 'titulo_editable', 'categoria')
+    list_filter = ('categoria',)
+
+    def titulo_editable(self, obj):
+        return format_html('<a href="/admin/cursos/curso/{}/change/">{}</a>', obj.id, obj.titulo)
+    titulo_editable.short_description = 'Título'
+    titulo_editable.admin_order_field = 'titulo'
 
 @admin.register(Leccion)
 class LeccionAdmin(admin.ModelAdmin):
