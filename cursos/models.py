@@ -12,7 +12,6 @@ class Curso(models.Model):
     titulo = models.CharField(max_length=255)
     descripcion = models.TextField()
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='cursos', null=True, blank=True)
-    imagen_url = models.URLField("URL de la imagen", blank=True, null=True)
 
     def __str__(self):
         return self.titulo
@@ -25,7 +24,6 @@ class Leccion(models.Model):
     titulo = models.CharField(max_length=100)
     contenido = models.TextField()
     video_url = models.URLField(blank=True, null=True)
-    guia_pdf_url = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return self.titulo
@@ -34,7 +32,7 @@ class Ejercicio(models.Model):
     leccion = models.ForeignKey(Leccion, on_delete=models.CASCADE, related_name='ejercicios')
     pregunta = models.TextField()
     opciones = models.JSONField(default=list)
-    respuesta_correcta = models.JSONField(default=list)
+    respuesta_correcta = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.pregunta

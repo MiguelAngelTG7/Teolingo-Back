@@ -10,6 +10,15 @@ class CategoriaAdmin(admin.ModelAdmin):
 
 # Formulario personalizado para Ejercicio
 class EjercicioAdminForm(forms.ModelForm):
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        # Guardar las opciones como lista
+        instance.opciones = self.cleaned_data['opciones_text'] if isinstance(self.cleaned_data['opciones_text'], list) else [self.cleaned_data['opciones_text']]
+        # Guardar la respuesta correcta como string
+        instance.respuesta_correcta = self.cleaned_data.get('respuesta_correcta', '')
+        if commit:
+            instance.save()
+        return instance
     opciones_text = forms.CharField(
         label="Opciones (una por línea)",
         widget=forms.Textarea,
@@ -17,16 +26,16 @@ class EjercicioAdminForm(forms.ModelForm):
         help_text="Escribe una opción por línea."
     )
 
-    respuesta_correcta = forms.ChoiceField(
+    respuesta_correcta = forms.CharField(
         label="Respuesta correcta",
-        choices=[],
         required=False,
-        help_text="Selecciona la respuesta correcta."
+        help_text="Selecciona la respuesta correcta.",
+        widget=forms.Select(choices=[])
     )
 
     class Meta:
         model = Ejercicio
-        fields = '__all__'
+        fields = ['leccion', 'pregunta', 'opciones_text', 'respuesta_correcta']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -36,12 +45,12 @@ class EjercicioAdminForm(forms.ModelForm):
             opciones = [(op, op) for op in self.instance.opciones]
         else:
             opciones = []
-        # Ocultar el campo original de opciones
-        self.fields['opciones'].widget = forms.HiddenInput()
-        # Setear choices para respuesta_correcta
-        self.fields['respuesta_correcta'].choices = opciones
+        # Ocultar el campo original de opciones solo si existe
+        if 'opciones' in self.fields:
+            self.fields['opciones'].widget = forms.HiddenInput()
+        # No setear choices para respuesta_correcta, el widget se actualizará solo por JS
         # Setear valor inicial para respuesta_correcta
-        if self.instance and self.instance.respuesta_correcta:
+        if self.instance and self.instance.respuesta_correcta is not None:
             self.fields['respuesta_correcta'].initial = self.instance.respuesta_correcta
 
     def clean_opciones_text(self):
@@ -80,6 +89,8 @@ class LeccionAdmin(admin.ModelAdmin):
 class EjercicioAdmin(admin.ModelAdmin):
     form = EjercicioAdminForm
     list_display = ('pregunta', 'leccion')
+    class Media:
+        js = ('cursos/admin_ejercicio.js',)
 
 @admin.register(Progreso)
 class ProgresoAdmin(admin.ModelAdmin):
