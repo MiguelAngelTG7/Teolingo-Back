@@ -1,9 +1,22 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from .models import Curso, Leccion, Progreso
-from .serializers import CursoSerializer, CursoDetailSerializer, LeccionDetailSerializer, ProgresoCursoSerializer, ProgresoLeccionSerializer
+from .models import Curso, Leccion, Progreso, ExamenFinal
+from .serializers import CursoSerializer, CursoDetailSerializer, LeccionDetailSerializer, ProgresoCursoSerializer, ProgresoLeccionSerializer, ExamenFinalSerializer
+
+# Vista para obtener el examen final de un curso
+class ExamenFinalCursoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, curso_id):
+        curso = get_object_or_404(Curso, id=curso_id)
+        examen = getattr(curso, 'examen_final', None)
+        if not examen:
+            return Response({'detail': 'Este curso no tiene examen final.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = ExamenFinalSerializer(examen)
+        return Response(serializer.data)
 
 class CursosInscritosView(APIView):
     permission_classes = [permissions.IsAuthenticated]

@@ -1,6 +1,27 @@
 
 from rest_framework import serializers
-from .models import Curso, Leccion, Ejercicio, Progreso, Categoria
+from .models import Curso, Leccion, Ejercicio, Progreso, Categoria, ExamenFinal, PreguntaExamenFinal
+# Serializador para preguntas del examen final
+class PreguntaExamenFinalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PreguntaExamenFinal
+        fields = ['id', 'pregunta', 'opciones', 'respuesta_correcta']
+
+# Serializador para el examen final
+
+# Ya no se usa el related_name 'preguntas' en ExamenFinal, sino en Curso
+class ExamenFinalSerializer(serializers.ModelSerializer):
+    preguntas = serializers.SerializerMethodField()
+    curso_titulo = serializers.CharField(source='curso.titulo', read_only=True)
+
+    class Meta:
+        model = ExamenFinal
+        fields = ['id', 'curso', 'curso_titulo', 'titulo', 'contenido', 'preguntas']
+
+    def get_preguntas(self, obj):
+        curso = obj.curso
+        preguntas = curso.preguntas_examen_final.all()
+        return PreguntaExamenFinalSerializer(preguntas, many=True).data
 
 class CategoriaSerializer(serializers.ModelSerializer):
     class Meta:

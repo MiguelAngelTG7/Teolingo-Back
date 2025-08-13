@@ -19,6 +19,26 @@ class Curso(models.Model):
     def esta_inscrito(self, usuario):
         return self.inscripcion_set.filter(usuario=usuario).exists()
 
+
+class ExamenFinal(models.Model):
+    curso = models.OneToOneField(Curso, on_delete=models.CASCADE, related_name='examen_final')
+    titulo = models.CharField(max_length=255)
+    contenido = models.TextField()
+
+    def __str__(self):
+        return f"Examen Final: {self.titulo}"
+
+
+class PreguntaExamenFinal(models.Model):
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='preguntas_examen_final')
+    pregunta = models.TextField()
+    opciones = models.JSONField(default=list)
+    respuesta_correcta = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.pregunta
+
+
 class Leccion(models.Model):
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='lecciones')
     titulo = models.CharField(max_length=100)
