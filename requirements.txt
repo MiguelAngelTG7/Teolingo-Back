@@ -6,3 +6,4 @@ django-cors-headers==4.7.0
 PyJWT==2.9.0
 sqlparse
 asgiref
+gunicorn
