@@ -8,3 +8,4 @@ sqlparse
 asgiref
 gunicorn
 dj-database-url
+whitenoise
