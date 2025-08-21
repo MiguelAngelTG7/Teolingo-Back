@@ -1,20 +1,19 @@
 from django.contrib import admin
 from django import forms
-from import_export.admin import ImportExportModelAdmin  # <-- Importa ImportExportModelAdmin
-from .models import Curso, Leccion, Ejercicio, Progreso, Inscripcion, Categoria, ExamenFinal, PreguntaExamenFinal, NombreDeTuModelo
+from import_export.admin import ImportExportModelAdmin
+from .models import Curso, Leccion, Ejercicio, Progreso, Inscripcion, Categoria, ExamenFinal, PreguntaExamenFinal
 # Examen Final
 
 from django.utils.html import format_html
 
 @admin.register(ExamenFinal)
-class ExamenFinalAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExportModelAdmin
+class ExamenFinalAdmin(ImportExportModelAdmin):
     list_display = ('id', 'curso', 'titulo')
 
     def curso_editable(self, obj):
         return format_html('<a href="/admin/cursos/curso/{}/change/">{}</a>', obj.curso.id, obj.curso.titulo)
     curso_editable.short_description = 'Curso'
     curso_editable.admin_order_field = 'curso__titulo'
-
 
 # Formulario personalizado para PreguntaExamenFinal
 class PreguntaExamenFinalAdminForm(forms.ModelForm):
@@ -45,13 +44,11 @@ class PreguntaExamenFinalAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Mostrar opciones como texto separado por líneas
         if self.instance and self.instance.opciones:
             self.fields['opciones_text'].initial = "\n".join(self.instance.opciones)
             opciones = [(op, op) for op in self.instance.opciones]
         else:
             opciones = []
-        # Ocultar el campo original de opciones solo si existe
         if 'opciones' in self.fields:
             self.fields['opciones'].widget = forms.HiddenInput()
         self.fields['respuesta_correcta'].widget.choices = opciones
@@ -72,9 +69,8 @@ class PreguntaExamenFinalAdminForm(forms.ModelForm):
             cleaned_data['respuesta_correcta'] = ''
         return cleaned_data
 
-
 @admin.register(PreguntaExamenFinal)
-class PreguntaExamenFinalAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExportModelAdmin
+class PreguntaExamenFinalAdmin(ImportExportModelAdmin):
     form = PreguntaExamenFinalAdminForm
     list_display = ('id', 'curso', 'pregunta')
     class Media:
@@ -85,20 +81,15 @@ class PreguntaExamenFinalAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin
     curso_editable.short_description = 'Curso'
     curso_editable.admin_order_field = 'curso__titulo'
 
-
 @admin.register(Categoria)
-class CategoriaAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExportModelAdmin
+class CategoriaAdmin(ImportExportModelAdmin):
     list_display = ('id', 'nombre')
-
-
 
 # Formulario personalizado para Ejercicio
 class EjercicioAdminForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
-        # Guardar las opciones como lista
         instance.opciones = self.cleaned_data['opciones_text'] if isinstance(self.cleaned_data['opciones_text'], list) else [self.cleaned_data['opciones_text']]
-        # Guardar la respuesta correcta como string
         instance.respuesta_correcta = self.cleaned_data.get('respuesta_correcta', '')
         if commit:
             instance.save()
@@ -123,24 +114,19 @@ class EjercicioAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Mostrar opciones como texto separado por líneas
         if self.instance and self.instance.opciones:
             self.fields['opciones_text'].initial = "\n".join(self.instance.opciones)
             opciones = [(op, op) for op in self.instance.opciones]
         else:
             opciones = []
-        # Ocultar el campo original de opciones solo si existe
         if 'opciones' in self.fields:
             self.fields['opciones'].widget = forms.HiddenInput()
-        # No setear choices para respuesta_correcta, el widget se actualizará solo por JS
-        # Setear valor inicial para respuesta_correcta
         if self.instance and self.instance.respuesta_correcta is not None:
             self.fields['respuesta_correcta'].initial = self.instance.respuesta_correcta
 
     def clean_opciones_text(self):
         data = self.cleaned_data['opciones_text']
         if isinstance(data, list):
-            # Ya está procesado
             return data
         return [line.strip() for line in data.splitlines() if line.strip()]
 
@@ -148,15 +134,12 @@ class EjercicioAdminForm(forms.ModelForm):
         cleaned_data = super().clean()
         opciones = self.clean_opciones_text()
         cleaned_data['opciones'] = opciones
-        # Si la respuesta correcta no está entre las opciones, la borra
         if cleaned_data.get('respuesta_correcta') not in opciones:
             cleaned_data['respuesta_correcta'] = ''
         return cleaned_data
 
-from django.utils.html import format_html
-
 @admin.register(Curso)
-class CursoAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExportModelAdmin
+class CursoAdmin(ImportExportModelAdmin):
     list_display = ('id', 'titulo_editable', 'categoria')
     list_filter = ('categoria',)
 
@@ -166,24 +149,20 @@ class CursoAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExp
     titulo_editable.admin_order_field = 'titulo'
 
 @admin.register(Leccion)
-class LeccionAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExportModelAdmin
+class LeccionAdmin(ImportExportModelAdmin):
     pass
 
 @admin.register(Ejercicio)
-class EjercicioAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExportModelAdmin
+class EjercicioAdmin(ImportExportModelAdmin):
     form = EjercicioAdminForm
     list_display = ('pregunta', 'leccion')
     class Media:
         js = ('cursos/admin_ejercicio.js',)
 
 @admin.register(Progreso)
-class ProgresoAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExportModelAdmin
+class ProgresoAdmin(ImportExportModelAdmin):
     pass
 
 @admin.register(Inscripcion)
-class InscripcionAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExportModelAdmin
-    pass
-
-@admin.register(NombreDeTuModelo)
-class NombreDeTuModeloAdmin(ImportExportModelAdmin):
+class InscripcionAdmin(ImportExportModelAdmin):
     pass
