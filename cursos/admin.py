@@ -87,22 +87,22 @@ class CategoriaAdmin(ImportExportModelAdmin):
 
 # Formulario personalizado para Ejercicio
 class EjercicioAdminForm(forms.ModelForm):
-    opcion = forms.CharField(
+    opciones = forms.CharField(
         label="Opciones (formato JSON)",
         widget=forms.Textarea,
         required=False,
-        help_text="Escribe las opciones en formato JSON: ['Opción 1', 'Opción 2', ...]"
+        help_text="Escribe las opciones en formato JSON: [\"Opción 1\", \"Opción 2\", ...]"
     )
 
     class Meta:
         model = Ejercicio
-        fields = ['leccion', 'pregunta', 'opcion', 'respuesta_correcta']
+        fields = ['leccion', 'pregunta', 'opciones', 'respuesta_correcta']
 
-    def clean_opcion(self):
+    def clean_opciones(self):
         import json
-        data = self.cleaned_data['opcion']
+        data = self.cleaned_data['opciones']
         try:
-            opciones = json.loads(data.replace("'", '"'))
+            opciones = json.loads(data)
             if not isinstance(opciones, list):
                 raise forms.ValidationError("El campo debe ser una lista JSON.")
             return opciones
@@ -111,7 +111,7 @@ class EjercicioAdminForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        cleaned_data['opciones'] = cleaned_data.get('opcion', [])
+        cleaned_data['opciones'] = cleaned_data.get('opciones', [])
         return cleaned_data
 
 @admin.register(Curso)
