@@ -26,9 +26,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-@!&kwar^hn673w-te0^lq$cua5%hz5rubi(pzz3zze7$pm^-)y')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
+DEBUG = False
 
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost').split(',')
+ALLOWED_HOSTS = [
+    "teolingo-back-production.up.railway.app",
+    # otros hosts si los tienes
+]
 
 
 # Application definition
@@ -153,3 +156,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://teolingo-back-production.up.railway.app",
+]
