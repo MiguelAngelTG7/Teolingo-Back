@@ -1,12 +1,13 @@
 from django.contrib import admin
 from django import forms
-from .models import Curso, Leccion, Ejercicio, Progreso, Inscripcion, Categoria, ExamenFinal, PreguntaExamenFinal
+from import_export.admin import ImportExportModelAdmin  # <-- Importa ImportExportModelAdmin
+from .models import Curso, Leccion, Ejercicio, Progreso, Inscripcion, Categoria, ExamenFinal, PreguntaExamenFinal, NombreDeTuModelo
 # Examen Final
 
 from django.utils.html import format_html
 
 @admin.register(ExamenFinal)
-class ExamenFinalAdmin(admin.ModelAdmin):
+class ExamenFinalAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExportModelAdmin
     list_display = ('id', 'curso', 'titulo')
 
     def curso_editable(self, obj):
@@ -73,7 +74,7 @@ class PreguntaExamenFinalAdminForm(forms.ModelForm):
 
 
 @admin.register(PreguntaExamenFinal)
-class PreguntaExamenFinalAdmin(admin.ModelAdmin):
+class PreguntaExamenFinalAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExportModelAdmin
     form = PreguntaExamenFinalAdminForm
     list_display = ('id', 'curso', 'pregunta')
     class Media:
@@ -86,7 +87,7 @@ class PreguntaExamenFinalAdmin(admin.ModelAdmin):
 
 
 @admin.register(Categoria)
-class CategoriaAdmin(admin.ModelAdmin):
+class CategoriaAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExportModelAdmin
     list_display = ('id', 'nombre')
 
 
@@ -155,7 +156,7 @@ class EjercicioAdminForm(forms.ModelForm):
 from django.utils.html import format_html
 
 @admin.register(Curso)
-class CursoAdmin(admin.ModelAdmin):
+class CursoAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExportModelAdmin
     list_display = ('id', 'titulo_editable', 'categoria')
     list_filter = ('categoria',)
 
@@ -165,20 +166,24 @@ class CursoAdmin(admin.ModelAdmin):
     titulo_editable.admin_order_field = 'titulo'
 
 @admin.register(Leccion)
-class LeccionAdmin(admin.ModelAdmin):
+class LeccionAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExportModelAdmin
     pass
 
 @admin.register(Ejercicio)
-class EjercicioAdmin(admin.ModelAdmin):
+class EjercicioAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExportModelAdmin
     form = EjercicioAdminForm
     list_display = ('pregunta', 'leccion')
     class Media:
         js = ('cursos/admin_ejercicio.js',)
 
 @admin.register(Progreso)
-class ProgresoAdmin(admin.ModelAdmin):
+class ProgresoAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExportModelAdmin
     pass
 
 @admin.register(Inscripcion)
-class InscripcionAdmin(admin.ModelAdmin):
+class InscripcionAdmin(ImportExportModelAdmin):  # <-- Cambia ModelAdmin por ImportExportModelAdmin
+    pass
+
+@admin.register(NombreDeTuModelo)
+class NombreDeTuModeloAdmin(ImportExportModelAdmin):
     pass

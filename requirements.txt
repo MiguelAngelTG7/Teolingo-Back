@@ -9,3 +9,4 @@ asgiref
 gunicorn
 dj-database-url
 whitenoise
+django-import-export
