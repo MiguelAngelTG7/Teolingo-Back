@@ -87,55 +87,31 @@ class CategoriaAdmin(ImportExportModelAdmin):
 
 # Formulario personalizado para Ejercicio
 class EjercicioAdminForm(forms.ModelForm):
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        instance.opciones = self.cleaned_data['opciones_text'] if isinstance(self.cleaned_data['opciones_text'], list) else [self.cleaned_data['opciones_text']]
-        instance.respuesta_correcta = self.cleaned_data.get('respuesta_correcta', '')
-        if commit:
-            instance.save()
-        return instance
-    opciones_text = forms.CharField(
-        label="Opciones (una por línea)",
+    opcion = forms.CharField(
+        label="Opciones (formato JSON)",
         widget=forms.Textarea,
         required=False,
-        help_text="Escribe una opción por línea."
-    )
-
-    respuesta_correcta = forms.CharField(
-        label="Respuesta correcta",
-        required=False,
-        help_text="Selecciona la respuesta correcta.",
-        widget=forms.Select(choices=[])
+        help_text="Escribe las opciones en formato JSON: ['Opción 1', 'Opción 2', ...]"
     )
 
     class Meta:
         model = Ejercicio
-        fields = ['leccion', 'pregunta', 'opciones_text', 'respuesta_correcta']
+        fields = ['leccion', 'pregunta', 'opcion', 'respuesta_correcta']
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance and self.instance.opciones:
-            self.fields['opciones_text'].initial = "\n".join(self.instance.opciones)
-            opciones = [(op, op) for op in self.instance.opciones]
-        else:
-            opciones = []
-        if 'opciones' in self.fields:
-            self.fields['opciones'].widget = forms.HiddenInput()
-        if self.instance and self.instance.respuesta_correcta is not None:
-            self.fields['respuesta_correcta'].initial = self.instance.respuesta_correcta
-
-    def clean_opciones_text(self):
-        data = self.cleaned_data['opciones_text']
-        if isinstance(data, list):
-            return data
-        return [line.strip() for line in data.splitlines() if line.strip()]
+    def clean_opcion(self):
+        import json
+        data = self.cleaned_data['opcion']
+        try:
+            opciones = json.loads(data.replace("'", '"'))
+            if not isinstance(opciones, list):
+                raise forms.ValidationError("El campo debe ser una lista JSON.")
+            return opciones
+        except Exception as e:
+            raise forms.ValidationError(f"Formato JSON inválido: {e}")
 
     def clean(self):
         cleaned_data = super().clean()
-        opciones = self.clean_opciones_text()
-        cleaned_data['opciones'] = opciones
-        if cleaned_data.get('respuesta_correcta') not in opciones:
-            cleaned_data['respuesta_correcta'] = ''
+        cleaned_data['opciones'] = cleaned_data.get('opcion', [])
         return cleaned_data
 
 @admin.register(Curso)
