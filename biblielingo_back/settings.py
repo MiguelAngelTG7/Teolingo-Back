@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
-#import dj_database_url
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,20 +27,18 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-@!&kwar^hn673w
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-#DEBUG = False #*PRODUCCIÓN*
-DEBUG = True #*DESARROLLO*
+DEBUG = False #*PRODUCCIÓN*
+#DEBUG = True #*DESARROLLO*
 
 # Frontend URL
-FRONTEND_URL = 'http://localhost:5173'  # URL del frontend en desarrollo
-#FRONTEND_URL = 'https://teolingo-front.vercel.app'  # URL del frontend en producción
+#FRONTEND_URL = 'http://localhost:5173'  # URL del frontend en desarrollo
+FRONTEND_URL = 'https://teolingo-front.vercel.app'  # URL del frontend en producción
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
-#ALLOWED_HOSTS = ["teolingo-back-production.up.railway.app",]  #*PRODUCCIÓN*
+ALLOWED_HOSTS = ["teolingo-back-production.up.railway.app",]  #*PRODUCCIÓN*
+#ALLOWED_HOSTS = ['localhost', '127.0.0.1']  #*DESARROLLO*
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
+    "https://teolingo-front.vercel.app",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -120,21 +118,21 @@ WSGI_APPLICATION = 'biblielingo_back.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-#DATABASES = {
-#    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
-#}
+DATABASES = {
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+}
 #*PRODUCCIÓN*
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'teolingodb',
-        'USER': 'postgres',
-        'PASSWORD': 'root',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': 'teolingodb',
+#        'USER': 'postgres',
+#        'PASSWORD': 'root',
+#        'HOST': 'localhost',
+#        'PORT': '5432',
+#    }
+#}
 #*DESARROLLO*
 
 # Password validation
