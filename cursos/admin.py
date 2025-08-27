@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django import forms
+from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from .models import Curso, Leccion, Ejercicio, Progreso, Inscripcion, Categoria, ExamenFinal, PreguntaExamenFinal
 # Examen Final
@@ -114,6 +115,13 @@ class EjercicioAdminForm(forms.ModelForm):
         cleaned_data['opciones'] = cleaned_data.get('opciones', [])
         return cleaned_data
 
+class EjercicioResource(resources.ModelResource):
+    class Meta:
+        model = Ejercicio
+        fields = ('id', 'leccion', 'pregunta', 'opciones', 'respuesta_correcta', 'explicacion', 'puntaje')
+        import_id_fields = ['id']
+        export_order = fields
+
 @admin.register(Curso)
 class CursoAdmin(ImportExportModelAdmin):
     list_display = ('id', 'titulo_editable', 'categoria')
@@ -126,14 +134,27 @@ class CursoAdmin(ImportExportModelAdmin):
 
 @admin.register(Leccion)
 class LeccionAdmin(ImportExportModelAdmin):
-    pass
+    list_display = ('id', 'titulo', 'curso')
+    list_filter = ('curso',)
+    ordering = ['curso', 'id']
+    search_fields = ('titulo',)
 
 @admin.register(Ejercicio)
 class EjercicioAdmin(ImportExportModelAdmin):
-    form = EjercicioAdminForm
-    list_display = ('pregunta', 'leccion')
-    class Media:
-        js = ('cursos/admin_ejercicio.js',)
+    resource_class = EjercicioResource
+    list_display = ('id', 'pregunta', 'leccion', 'respuesta_correcta', 'puntaje')
+    list_filter = ('leccion',)
+    search_fields = ('pregunta', 'respuesta_correcta')
+    ordering = ['leccion', 'id']
+    fieldsets = (
+        (None, {
+            'fields': ('leccion', 'pregunta', 'opciones', 'respuesta_correcta')
+        }),
+        ('Detalles adicionales', {
+            'fields': ('explicacion', 'puntaje'),
+            'classes': ('collapse',)
+        }),
+    )
 
 @admin.register(Progreso)
 class ProgresoAdmin(ImportExportModelAdmin):

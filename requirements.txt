@@ -10,3 +10,4 @@ gunicorn
 dj-database-url
 whitenoise
 django-import-export
+pytz==2023.3
