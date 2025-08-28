@@ -23,14 +23,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-@!&kwar^hn673w-te0^lq$cua5%hz5rubi(pzz3zze7$pm^-)y')
+SECRET_KEY = 'django-insecure-@!&kwar^hn673w-te0^lq$cua5%hz5rubi(pzz3zze7$pm^-)y'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
 DEBUG = False #*PRODUCCIÓN*
 #DEBUG = True #*DESARROLLO*
 
-# Frontend URL
 #FRONTEND_URL = 'http://localhost:5173'  # URL del frontend en desarrollo
 FRONTEND_URL = 'https://teolingo-front.vercel.app'  # URL del frontend en producción
 
@@ -118,11 +117,13 @@ WSGI_APPLICATION = 'biblielingo_back.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+#*PRODUCCIÓN*
 DATABASES = {
     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
-#*PRODUCCIÓN*
 
+
+#*DESARROLLO*
 #DATABASES = {
 #    'default': {
 #        'ENGINE': 'django.db.backends.postgresql',
@@ -133,7 +134,7 @@ DATABASES = {
 #        'PORT': '5432',
 #    }
 #}
-#*DESARROLLO*
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -175,9 +176,11 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+# En producción, no necesitamos STATICFILES_DIRS ya que todo se recopilará en STATIC_ROOT
+if DEBUG:
+    STATICFILES_DIRS = [
+        BASE_DIR / 'static',
+    ]
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -185,17 +188,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-CORS_ALLOW_ALL_ORIGINS = False
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://teolingo-front.vercel.app",
-]
-frontend_url = os.environ.get('FRONTEND_URL')
-if frontend_url:
-    CORS_ALLOWED_ORIGINS.append(frontend_url)
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -237,16 +229,6 @@ SIMPLE_JWT = {
 CSRF_TRUSTED_ORIGINS = [
     "https://teolingo-back-production.up.railway.app",
 ]
-
-# Caching
-# https://docs.djangoproject.com/en/5.2/topics/cache/
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
-    }
-}
 
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
