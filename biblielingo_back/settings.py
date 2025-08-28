@@ -66,6 +66,7 @@ CORS_ALLOW_HEADERS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'usuarios',  # Must be before admin since it contains the custom user model
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -76,7 +77,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'import_export',
-    'usuarios',
     'cursos',
 ]
 
@@ -119,7 +119,7 @@ WSGI_APPLICATION = 'biblielingo_back.wsgi.application'
 
 #*PRODUCCIÓN*
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+    'default': dj_database_url.config(default='${{ Postgres.DATABASE_URL }}')
 }
 
 
