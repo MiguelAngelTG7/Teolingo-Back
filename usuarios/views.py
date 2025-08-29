@@ -16,6 +16,9 @@ from datetime import timedelta
 from .serializers import UsuarioSerializer, CustomTokenObtainPairSerializer
 from .models import Usuario
 from .utils import send_async_mail
+import logging
+
+logger = logging.getLogger('django.mail')
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -30,28 +33,29 @@ class RegistroView(APIView):
                 user = serializer.save()
                 verification_url = f"{settings.FRONTEND_URL}/verificar-email/{user.token_verificacion}"
                 
-                # Use async email sender
-                send_async_mail(
-                    subject='Verifica tu cuenta de Teolingo',
-                    message=f'Hola {user.nombre_completo},\n\n'
-                           f'Gracias por registrarte en Teolingo. '
-                           f'Por favor haz clic en el siguiente enlace para verificar tu cuenta:\n\n'
-                           f'{verification_url}\n\n'
-                           f'Si no creaste esta cuenta, puedes ignorar este mensaje.\n\n'
-                           f'Saludos,\nEquipo Teolingo',
-                    recipient_list=[user.email]
-                )
+                # Log antes de enviar el email
+                logger.debug(f"Intentando enviar email a: {user.email}")
+                
+                try:
+                    send_mail(
+                        'Verifica tu cuenta de Teolingo',
+                        f'Hola {user.nombre_completo},\n\nPor favor verifica tu cuenta haciendo clic aquí.',
+                        settings.DEFAULT_FROM_EMAIL,
+                        [user.email],
+                        fail_silently=False,
+                    )
+                    logger.debug(f"Email enviado exitosamente a {user.email}")
+                except Exception as e:
+                    logger.error(f"Error enviando email: {str(e)}")
+                    # Aún así retornamos éxito al usuario
                 
                 return Response({
                     'message': 'Usuario registrado exitosamente. Por favor verifica tu correo electrónico.',
                     'email': user.email
                 }, status=status.HTTP_201_CREATED)
-                
             except Exception as e:
-                print(f"Error in registration: {str(e)}")  # Debug log
-                return Response({
-                    'error': f'Error al procesar el registro: {str(e)}'
-                }, status=status.HTTP_400_BAD_REQUEST)
+                logger.error(f"Error en registro: {str(e)}")
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PerfilView(APIView):

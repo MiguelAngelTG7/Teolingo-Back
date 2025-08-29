@@ -210,58 +210,30 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
-# Email Configuration - Update these settings
+# Email Configuration con más logging para debug
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'mikicho.junior@gmail.com'
-EMAIL_HOST_PASSWORD = 'zbso atsw qflk iigk'  # Make sure this is an App Password
-EMAIL_TIMEOUT = 5  # Reduced timeout to prevent hanging
+EMAIL_HOST_PASSWORD = 'zbso atsw qflk iigk'
+EMAIL_TIMEOUT = 20
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-# Add these new settings
-EMAIL_SUBJECT_PREFIX = '[Teolingo] '
-SERVER_EMAIL = EMAIL_HOST_USER
-ADMINS = [('Admin', EMAIL_HOST_USER)]
-
-# Update logging to include email errors
+# Añadir logging específico para emails
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '[{asctime}] {levelname} [{name}] {message}',
-            'style': '{',
-            'datefmt': '%Y-%m-%d %H:%M:%S'
-        },
-    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
         },
     },
     'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'django.request': {
-            'handlers': ['console', 'mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-        'django.mail': {  # Add specific logger for mail
+        'django.mail': {
             'handlers': ['console'],
             'level': 'DEBUG',
-            'propagate': True,
-        }
+        },
     },
 }
 
