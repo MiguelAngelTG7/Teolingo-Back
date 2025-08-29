@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
-import os
 import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -36,17 +35,19 @@ FRONTEND_URL = 'https://teolingo-front.vercel.app'  # URL del frontend en produc
 ALLOWED_HOSTS = ["teolingo-back-production.up.railway.app", "*"]  #*PRODUCCIÓN*
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1']  #*DESARROLLO*
 
+# Configuración CORS
 CORS_ALLOWED_ORIGINS = [
     "https://teolingo-front.vercel.app",
 ]
 
-# Configuración adicional de CORS
-CORS_ALLOW_ALL_ORIGINS = False
-CORS_ORIGIN_ALLOW_ALL = False
-CORS_REPLACE_HTTPS_REFERER = True
-
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = False  # Mantener en False por seguridad
+CORS_ALLOW_ALL_ORIGINS = False
+
+# Configuración específica de seguridad CORS
+CSRF_TRUSTED_ORIGINS = [
+    "https://teolingo-front.vercel.app",
+    "https://teolingo-back-production.up.railway.app",
+]
 
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -56,10 +57,6 @@ CORS_ALLOW_METHODS = [
     'POST',
     'PUT',
 ]
-
-CORS_ALLOW_ALL_HEADERS = True
-CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
-CORS_PREFLIGHT_MAX_AGE = 86400
 
 CORS_ALLOW_HEADERS = [
     'accept',
@@ -72,6 +69,9 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
+CORS_PREFLIGHT_MAX_AGE = 86400
 
 # Application definition
 
@@ -127,10 +127,12 @@ WSGI_APPLICATION = 'biblielingo_back.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-#*PRODUCCIÓN*
+# Database configuration for production
 DATABASES = {
-    #'default': dj_database_url.config(default='${{ Postgres.DATABASE_URL }}')
-    'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
+    'default': dj_database_url.config(
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 
