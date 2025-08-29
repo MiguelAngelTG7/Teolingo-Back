@@ -36,10 +36,7 @@ ALLOWED_HOSTS = ["teolingo-back-production.up.railway.app", "*"]  #*PRODUCCIÓN*
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1']  #*DESARROLLO*
 
 # Configuración CORS
-# Remove this line as it conflicts with specific origins
-# CORS_ORIGIN_ALLOW_ALL = True  
-
-# Update CORS settings
+# Remove all previous CORS settings and replace with these
 CORS_ALLOWED_ORIGINS = [
     "https://teolingo-front.vercel.app",
     "http://localhost:5173",
@@ -47,7 +44,7 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_METHODS = [
+CORS_ALLOWED_METHODS = [
     'DELETE',
     'GET',
     'OPTIONS',
@@ -56,7 +53,7 @@ CORS_ALLOW_METHODS = [
     'PUT',
 ]
 
-CORS_ALLOW_HEADERS = [
+CORS_ALLOWED_HEADERS = [
     'accept',
     'accept-encoding',
     'authorization',
@@ -67,9 +64,6 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
-
-# Add these new settings
-CORS_EXPOSE_HEADERS = ['content-type', 'x-requested-with']
 
 # Application definition
 
@@ -92,8 +86,8 @@ AUTH_USER_MODEL = 'usuarios.Usuario'
 
 # Update middleware order - CORS middleware must be first
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # Must be first
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -216,14 +210,15 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
-# Configuración de Email
+# Add timeout settings for email
+EMAIL_TIMEOUT = 30  # seconds
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'mikicho.junior@gmail.com' 
-EMAIL_HOST_PASSWORD = 'zbso atsw qflk iigk' 
-DEFAULT_FROM_EMAIL =  'Teolingo <mikicho.junior@gmail.com>'
+EMAIL_HOST_USER = 'mikicho.junior@gmail.com'
+EMAIL_HOST_PASSWORD = 'zbso atsw qflk iigk'
+DEFAULT_FROM_EMAIL = 'Teolingo <mikicho.junior@gmail.com>'
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
@@ -255,9 +250,16 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
         },
     },
     'loggers': {
@@ -268,6 +270,18 @@ LOGGING = {
         'django.request': {
             'handlers': ['console'],
             'level': 'DEBUG',
+            'propagate': True,
+        },
+        'django.server': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
     },
 }
+
+# Add CSRF trusted origins
+CSRF_TRUSTED_ORIGINS = [
+    "https://teolingo-front.vercel.app",
+    "https://teolingo-back-production.up.railway.app",
+]
