@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-@!&kwar^hn673w-te0^lq$cua5%hz5rubi(pzz3zze7$pm^-)y
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = False #*PRODUCCIÓN*
+DEBUG = True #*PRODUCCIÓN*
 #DEBUG = True #*DESARROLLO*
 
 #FRONTEND_URL = 'http://localhost:5173'  # URL del frontend en desarrollo
@@ -210,29 +210,59 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
-# Add timeout settings for email
-EMAIL_TIMEOUT = 30  # seconds
+# Email Configuration - Update these settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'mikicho.junior@gmail.com'
-EMAIL_HOST_PASSWORD = 'zbso atsw qflk iigk'
-DEFAULT_FROM_EMAIL = 'Teolingo <mikicho.junior@gmail.com>'
+EMAIL_HOST_PASSWORD = 'zbso atsw qflk iigk'  # Make sure this is an App Password
+EMAIL_TIMEOUT = 5  # Reduced timeout to prevent hanging
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
-    'UPDATE_LAST_LOGIN': False,
-    'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,
-    'VERIFYING_KEY': None,
-    'AUTH_HEADER_TYPES': ('Bearer',),
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+# Add these new settings
+EMAIL_SUBJECT_PREFIX = '[Teolingo] '
+SERVER_EMAIL = EMAIL_HOST_USER
+ADMINS = [('Admin', EMAIL_HOST_USER)]
+
+# Update logging to include email errors
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{asctime}] {levelname} [{name}] {message}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['console', 'mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django.mail': {  # Add specific logger for mail
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        }
+    },
 }
 
 # Security Settings
@@ -245,40 +275,6 @@ SESSION_COOKIE_SECURE = True
 # SSL Settings
 SECURE_SSL_REDIRECT = False  # Railway maneja SSL
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# Logging settings
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-        },
-        'django.request': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'django.server': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
-}
 
 # Add CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [

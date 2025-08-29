@@ -15,96 +15,43 @@ from django.utils.crypto import get_random_string
 from datetime import timedelta
 from .serializers import UsuarioSerializer, CustomTokenObtainPairSerializer
 from .models import Usuario
+from .utils import send_async_mail
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 class RegistroView(APIView):
     permission_classes = [AllowAny]
-
+    
     def post(self, request):
         serializer = UsuarioSerializer(data=request.data)
         if serializer.is_valid():
-            with transaction.atomic():
-                # Crear usuario con is_active=False
-                user = serializer.save(is_active=False, email_verificado=False)
+            try:
+                user = serializer.save()
+                verification_url = f"{settings.FRONTEND_URL}/verificar-email/{user.token_verificacion}"
                 
-                # Generar token de verificación
-                token = get_random_string(64)
-                user.token_verificacion = token
-                user.token_verificacion_fecha = timezone.now()
-                user.save()
-
-            # Enviar correo de verificación
-            verification_url = f"{settings.FRONTEND_URL}/verificar-email/{token}"
-            subject = 'Verifica tu correo electrónico - Teolingo'
-            message = (
-                f"Hola {user.nombre_completo},\n\n"
-                f"Gracias por registrarte en Teolingo. Para completar tu registro, "
-                f"por favor verifica tu correo electrónico haciendo clic en el siguiente enlace:\n\n"
-                f"{verification_url}\n\n"
-                f"Este enlace expirará en 24 horas.\n\n"
-                f"Si no creaste esta cuenta, puedes ignorar este correo.\n\n"
-                f"Saludos,\n"
-                f"El equipo de Teolingo"
-            )
-            
-            try:
-                send_mail(
-                    subject,
-                    message,
-                    settings.EMAIL_HOST_USER,
-                    [user.email],
-                    fail_silently=False,
+                # Use async email sender
+                send_async_mail(
+                    subject='Verifica tu cuenta de Teolingo',
+                    message=f'Hola {user.nombre_completo},\n\n'
+                           f'Gracias por registrarte en Teolingo. '
+                           f'Por favor haz clic en el siguiente enlace para verificar tu cuenta:\n\n'
+                           f'{verification_url}\n\n'
+                           f'Si no creaste esta cuenta, puedes ignorar este mensaje.\n\n'
+                           f'Saludos,\nEquipo Teolingo',
+                    recipient_list=[user.email]
                 )
+                
                 return Response({
                     'message': 'Usuario registrado exitosamente. Por favor verifica tu correo electrónico.',
-                    'email_sent': True,
-                    'user': serializer.data
+                    'email': user.email
                 }, status=status.HTTP_201_CREATED)
+                
             except Exception as e:
+                print(f"Error in registration: {str(e)}")  # Debug log
                 return Response({
-                    'message': 'Usuario registrado pero hubo un problema al enviar el correo de verificación.',
-                    'error': str(e),
-                    'email_sent': False,
-                    'user': serializer.data
-                }, status=status.HTTP_201_CREATED)
-            '''
-            
-            try:
-                send_mail(
-                    subject,
-                    message,
-                    settings.EMAIL_HOST_USER,
-                    [user.email],
-                    fail_silently=False,
-                )
-                return Response({
-                    'message': 'Usuario registrado exitosamente. Por favor verifica tu correo electrónico.',
-                    'email_sent': True,
-                    'user': serializer.data
-                }, status=status.HTTP_201_CREATED)
-            except Exception as e:
-                return Response({
-                    'message': 'Usuario registrado pero hubo un problema al enviar el correo de verificación.',
-                    'error': str(e),
-                    'email_sent': False,
-                    'user': serializer.data
-                }, status=status.HTTP_201_CREATED)
-            '''
-            
-            send_mail(
-                subject,
-                message,
-                settings.EMAIL_HOST_USER,
-                [user.email],
-                fail_silently=False,
-            )
-
-            return Response({
-                'message': 'Usuario registrado correctamente. Por favor verifica tu correo electrónico.',
-                'email': user.email
-            }, status=status.HTTP_201_CREATED)
+                    'error': f'Error al procesar el registro: {str(e)}'
+                }, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PerfilView(APIView):
