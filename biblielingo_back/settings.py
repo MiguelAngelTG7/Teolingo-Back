@@ -36,10 +36,10 @@ ALLOWED_HOSTS = ["teolingo-back-production.up.railway.app", "*"]  #*PRODUCCIÓN*
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1']  #*DESARROLLO*
 
 # Configuración CORS
-CORS_ORIGIN_ALLOW_ALL = True  # Temporalmente para diagnóstico
-CORS_ALLOW_CREDENTIALS = True
+# Remove this line as it conflicts with specific origins
+# CORS_ORIGIN_ALLOW_ALL = True  
 
-# CORS Configuration
+# Update CORS settings
 CORS_ALLOWED_ORIGINS = [
     "https://teolingo-front.vercel.app",
     "http://localhost:5173",
@@ -68,6 +68,9 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
+# Add these new settings
+CORS_EXPOSE_HEADERS = ['content-type', 'x-requested-with']
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -87,16 +90,17 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
+# Update middleware order - CORS middleware must be first
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # Must be first
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # This should be as high as possible
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'biblielingo_back.urls'
@@ -246,3 +250,24 @@ SESSION_COOKIE_SECURE = True
 # SSL Settings
 SECURE_SSL_REDIRECT = False  # Railway maneja SSL
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Logging settings
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
+}
