@@ -119,7 +119,8 @@ WSGI_APPLICATION = 'biblielingo_back.wsgi.application'
 
 #*PRODUCCIÓN*
 DATABASES = {
-    'default': dj_database_url.config(default='${{ Postgres.DATABASE_URL }}')
+    #'default': dj_database_url.config(default='${{ Postgres.DATABASE_URL }}')
+    'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
 }
 
 
@@ -228,6 +229,7 @@ SIMPLE_JWT = {
 
 CSRF_TRUSTED_ORIGINS = [
     "https://teolingo-back-production.up.railway.app",
+    "https://teolingo-front.vercel.app",    
 ]
 
 SECURE_BROWSER_XSS_FILTER = True
