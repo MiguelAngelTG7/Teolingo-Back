@@ -39,15 +39,12 @@ ALLOWED_HOSTS = ["teolingo-back-production.up.railway.app", "*"]  #*PRODUCCIÓN*
 CORS_ALLOWED_ORIGINS = [
     "https://teolingo-front.vercel.app",
 ]
+CORS_ORIGIN_WHITELIST = [
+    "https://teolingo-front.vercel.app",
+]
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = False
-
-# Configuración específica de seguridad CORS
-CSRF_TRUSTED_ORIGINS = [
-    "https://teolingo-front.vercel.app",
-    "https://teolingo-back-production.up.railway.app",
-]
 
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -93,11 +90,11 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  
+    'corsheaders.middleware.CorsMiddleware',  # Debe ser primero
+    'django.middleware.common.CommonMiddleware',  # Debe estar justo después de CORS
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -245,8 +242,11 @@ CSRF_TRUSTED_ORIGINS = [
     "https://teolingo-front.vercel.app",    
 ]
 
+# Security Settings
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
