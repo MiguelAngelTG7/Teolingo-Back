@@ -197,8 +197,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'mikicho.junior@gmail.com' 
-EMAIL_HOST_PASSWORD = 'bhhq kpcf xjjk tefs' 
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = 'zbso atsw qflk iigk' 
+DEFAULT_FROM_EMAIL =  'Teolingo <mikicho.junior@gmail.com>'
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
