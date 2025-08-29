@@ -31,26 +31,8 @@ class RegistroView(APIView):
         if serializer.is_valid():
             try:
                 user = serializer.save()
-                verification_url = f"{settings.FRONTEND_URL}/verificar-email/{user.token_verificacion}"
-                
-                # Log antes de enviar el email
-                logger.debug(f"Intentando enviar email a: {user.email}")
-                
-                try:
-                    send_mail(
-                        'Verifica tu cuenta de Teolingo',
-                        f'Hola {user.nombre_completo},\n\nPor favor verifica tu cuenta haciendo clic aquí.',
-                        settings.DEFAULT_FROM_EMAIL,
-                        [user.email],
-                        fail_silently=False,
-                    )
-                    logger.debug(f"Email enviado exitosamente a {user.email}")
-                except Exception as e:
-                    logger.error(f"Error enviando email: {str(e)}")
-                    # Aún así retornamos éxito al usuario
-                
                 return Response({
-                    'message': 'Usuario registrado exitosamente. Por favor verifica tu correo electrónico.',
+                    'message': 'Usuario registrado exitosamente.',
                     'email': user.email
                 }, status=status.HTTP_201_CREATED)
             except Exception as e:

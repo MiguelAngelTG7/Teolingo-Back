@@ -37,14 +37,9 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         max_length=255,
         verbose_name='Nombre completo'
     )
-    is_active = models.BooleanField(default=False)  # Cambiado a False para requerir verificación
+    is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
-    email_verificado = models.BooleanField(default=False)
-    token_verificacion = models.CharField(max_length=100, blank=True, null=True)
-    token_verificacion_fecha = models.DateTimeField(null=True, blank=True)
-    token_reset_password = models.CharField(max_length=100, blank=True, null=True)
-    token_reset_password_fecha = models.DateTimeField(null=True, blank=True)
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['nombre_completo']
