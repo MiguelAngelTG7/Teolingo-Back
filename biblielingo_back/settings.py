@@ -33,7 +33,7 @@ DEBUG = False #*PRODUCCIÓN*
 #FRONTEND_URL = 'http://localhost:5173'  # URL del frontend en desarrollo
 FRONTEND_URL = 'https://teolingo-front.vercel.app'  # URL del frontend en producción
 
-ALLOWED_HOSTS = ["teolingo-back-production.up.railway.app",]  #*PRODUCCIÓN*
+ALLOWED_HOSTS = ["teolingo-back-production.up.railway.app", "*"]  #*PRODUCCIÓN*
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1']  #*DESARROLLO*
 
 CORS_ALLOWED_ORIGINS = [
@@ -41,6 +41,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = False  # Mantener en False por seguridad
 
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -50,6 +51,10 @@ CORS_ALLOW_METHODS = [
     'POST',
     'PUT',
 ]
+
+CORS_ALLOW_ALL_HEADERS = True
+CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
+CORS_PREFLIGHT_MAX_AGE = 86400
 
 CORS_ALLOW_HEADERS = [
     'accept',
