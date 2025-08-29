@@ -40,6 +40,11 @@ CORS_ALLOWED_ORIGINS = [
     "https://teolingo-front.vercel.app",
 ]
 
+# Configuración adicional de CORS
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_REPLACE_HTTPS_REFERER = True
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = False  # Mantener en False por seguridad
 

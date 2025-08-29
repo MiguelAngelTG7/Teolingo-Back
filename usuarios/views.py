@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.core.mail import send_mail
+from django.db import transaction
 from .serializers import CustomTokenObtainPairSerializer
 from django.conf import settings
 from django.utils import timezone
@@ -24,13 +25,15 @@ class RegistroView(APIView):
     def post(self, request):
         serializer = UsuarioSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            
-            # Generar token de verificación
-            token = get_random_string(64)
-            user.token_verificacion = token
-            user.token_verificacion_fecha = timezone.now()
-            user.save()
+            with transaction.atomic():
+                # Crear usuario con is_active=False
+                user = serializer.save(is_active=False, email_verificado=False)
+                
+                # Generar token de verificación
+                token = get_random_string(64)
+                user.token_verificacion = token
+                user.token_verificacion_fecha = timezone.now()
+                user.save()
 
             # Enviar correo de verificación
             verification_url = f"{settings.FRONTEND_URL}/verificar-email/{token}"
