@@ -6,7 +6,8 @@ from .views import (
     LeccionDetailView,
     CursoProgresoView,
     RegistrarRespuestaView,
-    ExamenFinalCursoView
+    ExamenFinalCursoView,
+    ActualizarProgresoLeccionView
 )
 
 urlpatterns = [
@@ -16,5 +17,6 @@ urlpatterns = [
     path('leccion/<int:leccion_id>/', LeccionDetailView.as_view(), name='leccion-detail'),
     path('<int:curso_id>/progreso/', CursoProgresoView.as_view(), name='curso-progreso'),
     path('ejercicio/<int:ejercicio_id>/respuesta/', RegistrarRespuestaView.as_view(), name='registrar-respuesta'),
+    path('leccion/<int:leccion_id>/progreso/', ActualizarProgresoLeccionView.as_view(), name='actualizar-progreso-leccion'),
     path('<int:curso_id>/examen-final/', ExamenFinalCursoView.as_view(), name='examen-final'),
 ]

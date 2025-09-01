@@ -15,6 +15,7 @@ from .serializers import (
     ProgresoSerializer,
     InscripcionSerializer
 )
+from datetime import datetime
 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -189,4 +190,28 @@ class ExamenFinalCursoView(APIView):
             'total': total_preguntas,
             'porcentaje': porcentaje,
             'aprobado': porcentaje >= 70
+        })
+
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class ActualizarProgresoLeccionView(APIView):
+    def post(self, request, leccion_id):
+        leccion = get_object_or_404(Leccion, id=leccion_id)
+        puntaje = request.data.get('puntaje', 0)
+        
+        # Crear o actualizar el progreso
+        progreso, created = Progreso.objects.update_or_create(
+            usuario=request.user,
+            leccion=leccion,
+            defaults={
+                'puntaje': puntaje,
+                'completado': True,
+                'fecha_completado': datetime.now()
+            }
+        )
+        
+        serializer = ProgresoSerializer(progreso)
+        return Response({
+            'message': 'Progreso actualizado exitosamente',
+            'progreso': serializer.data
         })
