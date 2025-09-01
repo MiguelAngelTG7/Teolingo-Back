@@ -14,10 +14,11 @@ class EjercicioSerializer(serializers.ModelSerializer):
 class LeccionSerializer(serializers.ModelSerializer):
     ejercicios = EjercicioSerializer(many=True, read_only=True)
     completada = serializers.SerializerMethodField()
+    curso_id = serializers.IntegerField(source='curso.id')
 
     class Meta:
         model = Leccion
-        fields = ('id', 'titulo', 'contenido', 'ejercicios', 'completada')
+        fields = ('id', 'titulo', 'contenido', 'ejercicios', 'completada', 'curso_id')
 
     def get_completada(self, obj):
         request = self.context.get('request')
