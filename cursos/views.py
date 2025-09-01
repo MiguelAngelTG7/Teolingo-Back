@@ -129,9 +129,16 @@ class CursoProgresoView(APIView):
                 leccion=leccion
             ).first()
             
-            ejercicios_completados = 0 if not progreso else progreso.ejercicios_completados
-            ejercicios_correctos = 0 if not progreso else progreso.ejercicios_correctos
-            puntaje = ejercicios_correctos * 3  # 3 XP por ejercicio correcto
+            # Si hay progreso y está completada, usar el puntaje guardado
+            if progreso and progreso.completado:
+                puntaje = progreso.puntaje
+                ejercicios_completados = progreso.ejercicios_completados
+                ejercicios_correctos = progreso.ejercicios_correctos
+            else:
+                puntaje = 0
+                ejercicios_completados = 0
+                ejercicios_correctos = 0
+                
             xp_total += puntaje
             
             lecciones_data.append({
