@@ -146,6 +146,37 @@ class RegistrarRespuestaView(APIView):
 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class ActualizarProgresoLeccionView(APIView):
+    def post(self, request, leccion_id):
+        # Obtener la lección
+        leccion = get_object_or_404(Leccion, id=leccion_id)
+        
+        try:
+            # Crear o actualizar el progreso
+            progreso, created = Progreso.objects.get_or_create(
+                usuario=request.user,
+                leccion=leccion,
+                defaults={'completado': True}
+            )
+            
+            if not created:
+                progreso.completado = True
+                progreso.save()
+            
+            return Response({
+                'message': 'Progreso actualizado correctamente',
+                'leccion_id': leccion_id,
+                'completado': True
+            })
+            
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
 class ExamenFinalCursoView(APIView):
     def get(self, request, curso_id):
         curso = get_object_or_404(Curso, id=curso_id)

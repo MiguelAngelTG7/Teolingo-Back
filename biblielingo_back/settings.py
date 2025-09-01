@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-@!&kwar^hn673w-te0^lq$cua5%hz5rubi(pzz3zze7$pm^-)y
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = True #*PRODUCCIÓN*
+DEBUG = False #*PRODUCCIÓN*
 #DEBUG = True #*DESARROLLO*
 
 #FRONTEND_URL = 'http://localhost:5173'  # URL del frontend en desarrollo
