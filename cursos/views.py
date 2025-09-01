@@ -116,12 +116,48 @@ class LeccionDetailView(APIView):
 @permission_classes([IsAuthenticated])
 class CursoProgresoView(APIView):
     def get(self, request, curso_id):
-        progreso = Progreso.objects.filter(
-            usuario=request.user,
-            leccion__curso_id=curso_id
-        )
-        serializer = ProgresoSerializer(progreso, many=True)
-        return Response(serializer.data)
+        curso = get_object_or_404(Curso, id=curso_id)
+        
+        # Obtener todas las lecciones del curso
+        lecciones = Leccion.objects.filter(curso=curso).order_by('id')
+        lecciones_data = []
+        xp_total = 0
+        
+        for leccion in lecciones:
+            progreso = Progreso.objects.filter(
+                usuario=request.user,
+                leccion=leccion
+            ).first()
+            
+            ejercicios_completados = 0 if not progreso else progreso.ejercicios_completados
+            ejercicios_correctos = 0 if not progreso else progreso.ejercicios_correctos
+            puntaje = ejercicios_correctos * 3  # 3 XP por ejercicio correcto
+            xp_total += puntaje
+            
+            lecciones_data.append({
+                'leccion': leccion.id,
+                'leccion_titulo': leccion.titulo,
+                'completado': True if progreso and progreso.completado else False,
+                'puntaje': puntaje,
+                'ejercicios_completados': ejercicios_completados,
+                'ejercicios_correctos': ejercicios_correctos
+            })
+        
+        # Calcular porcentaje total del curso
+        total_lecciones = len(lecciones)
+        completadas = sum(1 for l in lecciones_data if l['completado'])
+        porcentaje = (completadas / total_lecciones * 100) if total_lecciones > 0 else 0
+        
+        response_data = {
+            'curso_titulo': curso.titulo,
+            'lecciones': lecciones_data,
+            'xp_total': xp_total,
+            'porcentaje': porcentaje,
+            'total_lecciones': total_lecciones,
+            'lecciones_completadas': completadas
+        }
+        
+        return Response(response_data)
 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])

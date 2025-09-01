@@ -105,6 +105,8 @@ class Progreso(models.Model):
     leccion = models.ForeignKey(Leccion, on_delete=models.CASCADE)
     completado = models.BooleanField(default=False)
     puntaje = models.FloatField(default=0)
+    ejercicios_completados = models.IntegerField(default=0)
+    ejercicios_correctos = models.IntegerField(default=0)
 
     class Meta:
         unique_together = ('usuario', 'leccion')
