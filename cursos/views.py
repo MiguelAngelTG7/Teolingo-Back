@@ -118,33 +118,36 @@ class CursoProgresoView(APIView):
     def get(self, request, curso_id):
         curso = get_object_or_404(Curso, id=curso_id)
         
-        # Obtener todas las lecciones del curso
+        # Obtener todas las lecciones del curso y sus progresos en una sola consulta
         lecciones = Leccion.objects.filter(curso=curso).order_by('id')
+        progresos = Progreso.objects.filter(
+            usuario=request.user,
+            leccion__curso=curso
+        )
+        
+        # Crear un diccionario de progresos por leccion_id para fácil acceso
+        progreso_por_leccion = {p.leccion_id: p for p in progresos}
+        
         lecciones_data = []
         xp_total = 0
         
         for leccion in lecciones:
-            progreso = Progreso.objects.filter(
-                usuario=request.user,
-                leccion=leccion
-            ).first()
+            progreso = progreso_por_leccion.get(leccion.id)
             
-            # Si hay progreso y está completada, usar el puntaje guardado
             if progreso and progreso.completado:
-                puntaje = progreso.puntaje
-                ejercicios_completados = progreso.ejercicios_completados
-                ejercicios_correctos = progreso.ejercicios_correctos
+                puntaje = progreso.puntaje or 0  # En caso de que sea None
+                ejercicios_completados = progreso.ejercicios_completados or 0
+                ejercicios_correctos = progreso.ejercicios_correctos or 0
+                xp_total += puntaje  # Sumamos al XP total solo si la lección está completada
             else:
                 puntaje = 0
                 ejercicios_completados = 0
                 ejercicios_correctos = 0
-                
-            xp_total += puntaje
             
             lecciones_data.append({
                 'leccion': leccion.id,
                 'leccion_titulo': leccion.titulo,
-                'completado': True if progreso and progreso.completado else False,
+                'completado': bool(progreso and progreso.completado),
                 'puntaje': puntaje,
                 'ejercicios_completados': ejercicios_completados,
                 'ejercicios_correctos': ejercicios_correctos
@@ -197,21 +200,36 @@ class ActualizarProgresoLeccionView(APIView):
         leccion = get_object_or_404(Leccion, id=leccion_id)
         
         try:
+            puntaje = request.data.get('puntaje', 0)
+            ejercicios_completados = request.data.get('ejercicios_completados', 0)
+            ejercicios_correctos = request.data.get('ejercicios_correctos', 0)
+            
             # Crear o actualizar el progreso
             progreso, created = Progreso.objects.get_or_create(
                 usuario=request.user,
                 leccion=leccion,
-                defaults={'completado': True}
+                defaults={
+                    'completado': True,
+                    'puntaje': puntaje,
+                    'ejercicios_completados': ejercicios_completados,
+                    'ejercicios_correctos': ejercicios_correctos
+                }
             )
             
             if not created:
                 progreso.completado = True
+                progreso.puntaje = puntaje
+                progreso.ejercicios_completados = ejercicios_completados
+                progreso.ejercicios_correctos = ejercicios_correctos
                 progreso.save()
             
             return Response({
                 'message': 'Progreso actualizado correctamente',
                 'leccion_id': leccion_id,
-                'completado': True
+                'completado': True,
+                'puntaje': puntaje,
+                'ejercicios_completados': ejercicios_completados,
+                'ejercicios_correctos': ejercicios_correctos
             })
             
         except Exception as e:
