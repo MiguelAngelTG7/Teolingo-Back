@@ -32,7 +32,8 @@ DEBUG = False #*PRODUCCIÓN*
 #FRONTEND_URL = 'http://localhost:5173'  # URL del frontend en desarrollo
 FRONTEND_URL = 'https://teolingo-front.vercel.app'  # URL del frontend en producción
 
-ALLOWED_HOSTS = ["teolingo-back-production.up.railway.app", "*"]  #*PRODUCCIÓN*
+ALLOWED_HOSTS = ["teolingo-back.onrender.com", "*"]  #*PRODUCCIÓN - RENDER*
+#ALLOWED_HOSTS = ["teolingo-back-production.up.railway.app", "*"]  #*PRODUCCIÓN - RAILWAY*
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1']  #*DESARROLLO*
 
 # Configuración CORS
@@ -280,5 +281,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Add CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [
     "https://teolingo-front.vercel.app",
-    "https://teolingo-back-production.up.railway.app",
+    "https://teolingo-back.onrender.com",  # Render URL
+    #"https://teolingo-back-production.up.railway.app",  # Railway URL (comentado)
 ]
