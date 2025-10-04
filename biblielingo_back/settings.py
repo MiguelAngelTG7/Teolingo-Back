@@ -121,12 +121,19 @@ WSGI_APPLICATION = 'biblielingo_back.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Database configuration for production
+# Database configuration
 DATABASES = {
-    'default': dj_database_url.config(
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'teolingo_db',
+        'USER': 'teolingo_db_user',
+        'PASSWORD': 'q16mGZV8pedq4Z7Z6qLalb1OZSF71J9K',
+        'HOST': 'dpg-d3gm1hpr0fns73bog02g-a',
+        'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
+    }
 }
 
 
