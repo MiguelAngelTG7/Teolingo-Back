@@ -40,7 +40,7 @@ ALLOWED_HOSTS = ["teolingo-back.onrender.com", "*"]  #*PRODUCCIÓN - RENDER*
 # Remove all previous CORS settings and replace with these
 CORS_ALLOWED_ORIGINS = [
     "https://teolingo-front.vercel.app",
-    "http://localhost:5173",
+#   "http://localhost:5173",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
