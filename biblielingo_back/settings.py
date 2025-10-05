@@ -279,16 +279,17 @@ LOGGING = {
     },
 }
 
-# Security Settings
+# Security Settings para Render
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
 
-# SSL Settings
-SECURE_SSL_REDIRECT = False  # Railway maneja SSL
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Para Render, estas configuraciones deben ser False en desarrollo
+if not DEBUG:
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = False  # Render maneja SSL automáticamente
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Add CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [

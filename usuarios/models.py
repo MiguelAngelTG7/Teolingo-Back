@@ -46,6 +46,12 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
+    def get_full_name(self):
+        return self.nombre_completo or self.email
+    
+    def get_short_name(self):
+        return self.nombre_completo.split()[0] if self.nombre_completo else self.email.split('@')[0]
+    
     def __str__(self):
         return self.email
 
