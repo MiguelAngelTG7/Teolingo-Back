@@ -15,6 +15,9 @@ from .serializers import (
     ProgresoSerializer,
     InscripcionSerializer
 )
+import logging
+
+logger = logging.getLogger(__name__)
 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -70,7 +73,11 @@ class CursoDetailView(APIView):
         
     def post(self, request, curso_id):
         try:
+            print(f"=== DEBUG: Usuario autenticado: {request.user.id} ===")
+            print(f"=== DEBUG: Curso ID: {curso_id} ===")
+            
             curso = get_object_or_404(Curso, id=curso_id)
+            print(f"=== DEBUG: Curso encontrado: {curso.titulo} ===")
             
             # Verificar si ya está inscrito
             inscripcion_existente = Inscripcion.objects.filter(
@@ -79,15 +86,18 @@ class CursoDetailView(APIView):
             ).first()
             
             if inscripcion_existente:
+                print("=== DEBUG: Usuario ya inscrito ===")
                 return Response({
                     'message': 'Ya estás inscrito en este curso'
                 }, status=status.HTTP_400_BAD_REQUEST)
             
             # Crear nueva inscripción
+            print("=== DEBUG: Creando nueva inscripción ===")
             inscripcion = Inscripcion.objects.create(
                 usuario=request.user,
                 curso=curso
             )
+            print(f"=== DEBUG: Inscripción creada con ID: {inscripcion.id} ===")
             
             serializer = InscripcionSerializer(inscripcion, context={'request': request})
             return Response({
@@ -95,11 +105,10 @@ class CursoDetailView(APIView):
                 'inscripcion': serializer.data
             }, status=status.HTTP_201_CREATED)
             
-        except Curso.DoesNotExist:
-            return Response({
-                'error': 'El curso no existe'
-            }, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
+            print(f"=== ERROR: {str(e)} ===")
+            import traceback
+            print(f"=== TRACEBACK: {traceback.format_exc()} ===")
             return Response({
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

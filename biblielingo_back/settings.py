@@ -257,7 +257,7 @@ EMAIL_HOST_PASSWORD = 'zbso atsw qflk iigk'
 EMAIL_TIMEOUT = 20
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-# Añadir logging específico para emails
+# Logging configuration
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -266,10 +266,15 @@ LOGGING = {
             'class': 'logging.StreamHandler',
         },
     },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
     'loggers': {
-        'django.mail': {
+        'django': {
             'handlers': ['console'],
             'level': 'DEBUG',
+            'propagate': False,
         },
     },
 }
