@@ -6,7 +6,7 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cursos', '0005_alter_leccion_options_remove_leccion_orden'),  # Cambia este número si es necesario
+        ('cursos', '0006_alter_preguntaexamenfinal_options_and_more'),  # Cambiado aquí
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
